@@ -12,7 +12,7 @@ def read_excel(file):
         df = pd.read_excel(file)
     return df
 
-f = open('data/corpus_product.txt', 'r', encoding="utf8")
+f = open('data/corpus_medical.txt', 'r', encoding="utf8")
 s = f.read()
 
 # df = pd.read_excel("data/train.xlsx")
@@ -74,5 +74,5 @@ data_out = pd.concat(t[1:]).sort_values(ascending=False)
 df_out["word"] = data_out.index
 df_out["cnt"] = data_out.values
 
-df_out.to_excel('data/result_product.xlsx', index=False)
-pd.DataFrame(data_out).to_csv('data/result_product.txt', sep="\t", header = False)
+df_out.to_excel('data/result_medical.xlsx', index=False)
+pd.DataFrame(data_out).to_csv('data/result_medical.txt', sep="\t", header = False)
