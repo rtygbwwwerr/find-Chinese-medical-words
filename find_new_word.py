@@ -6,6 +6,7 @@ Created on 2018年7月10日
 from collections import defaultdict
 import numpy as np
 from tqdm import tqdm
+import pandas as pd
 import re
 class FindNewToken(object):
     def __init__(self,txt_path,write_path = 'data/result_medical2.txt',min_count=25,token_length=4,min_proba={2:5,3:25,4:125}):
@@ -32,7 +33,7 @@ class FindNewToken(object):
     def statistic_ngrams(self): #粗略统计1，2..ngrams
         print('Starting statistic ngrams!')
         ngrams = defaultdict(int)
-        for txt in self.texts:
+        for txt in tqdm(self.texts):
             for char_id in range(len(txt)):
                 for step in range(1,self.token_length+1): 
                     if char_id+step <=len(txt):
@@ -69,9 +70,10 @@ class FindNewToken(object):
         return (txt,sent_token)
     
     def sentences_cut(self):
+        print("start cut sentences")
         self.sentences_tokens = []
         all_tokens = defaultdict(int)
-        for txt in self.texts:
+        for txt in tqdm(self.texts):
             if len(txt)>2:
                 for token in self.cut_sentence(txt)[1]:
                     all_tokens[token] +=1
@@ -89,6 +91,7 @@ class FindNewToken(object):
             return True
     
     def judge_exist(self):
+        print("start judge exist")
         self.pairs = []##按照句子-token  进行显示
         for sent,token in self.sentences_tokens:
             real_token = []
@@ -108,20 +111,29 @@ class FindNewToken(object):
         
                 
     def write(self):
-        with open(self.write_path,'w',encoding='utf-8') as f:
-            # for key in tqdm(self.new_word):
-            #     if len(key)!= 1:  
-            #         f.write(key+'\n')
-            for sent,token in self.pairs:
-                f.write(sent+','+','.join(token)+'\n')
-    
-
-
+#         with open(self.write_path,'w',encoding='utf-8') as f:
+#             # for key in tqdm(self.new_word):
+#             #     if len(key)!= 1:  
+#             #         f.write(key+'\n')
+#             for sent,token in self.pairs:
+#                 f.write(sent+','+','.join(token)+'\n')
+        
+        words = []
+        cnts = []
+        for word, cnt in self.new_word.items():
+            words.append(word)
+            cnts.append(cnt)
+        df_out = pd.DataFrame()
+        df_out["word"] = words
+        df_out["cnt"] = cnts
+        df_out = df_out.sort_values(by="cnt",ascending= False)
+        df_out.to_excel('data/result_medical2.xlsx', index=False)
+        df_out.to_csv('data/result_medical2.txt', sep="\t", header = False)
 
 if __name__ =='__main__':
     txt_path = 'data/corpus_medical.txt'
     findtoken = FindNewToken(txt_path)
     findtoken.statistic_token()
-
+    
         
         
